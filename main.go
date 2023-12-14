@@ -15,7 +15,7 @@ func main() {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT TOP 10 * FROM Sample.person")
+	rows, err := db.Query("select top 10 * from NYTaxi.RowRides")
 	if err != nil {
 		log.Fatal(err)
 	}
