@@ -2,8 +2,10 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 
 	_ "github.com/alexbrainman/odbc"
 )
@@ -47,11 +49,23 @@ func main() {
 		}
 	}
 
-	fmt.Println("Fetched Results:")
-	for i := 0; i < len(results); i += len(columns) {
-		for j := 0; j < len(columns); j++ {
-			fmt.Printf("%s: %v\t", columns[j], results[i+j])
-		}
-		fmt.Println()
+	// Convert results to JSON
+	jsonData, err := json.Marshal(results)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	// Write JSON data to a file
+	file, err := os.Create("results.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	_, err = file.Write(jsonData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Results written to results.json")
 }
