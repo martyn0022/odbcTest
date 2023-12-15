@@ -17,7 +17,7 @@ func main() {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("select top 10 * from NYTaxi.Zones")
+	rows, err := db.Query("select TOP 10 VendorID, $PIECE(CAST(tpep_pickup_datetime as VARCHAR),' ',1), passenger_count, trip_distance from NYTaxi.Rides")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +28,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	var results []interface{}
+	var results [][]interface{} // Modified to hold arrays of values
+
 	for rows.Next() {
 		values := make([]interface{}, len(columns))
 		pointers := make([]interface{}, len(columns))
@@ -40,17 +41,24 @@ func main() {
 			log.Fatal(err)
 		}
 
-		for _, v := range values {
-			if b, ok := v.([]byte); ok {
-				results = append(results, string(b))
-			} else {
-				results = append(results, v)
-			}
-		}
+		results = append(results, values) // Append each row's values as an array
 	}
 
-	// Convert results to JSON
-	jsonData, err := json.Marshal(results)
+	// Optional: Include column names in the JSON
+	includeColumnNames := true // Change to false to exclude column names
+
+	var finalResult interface{}
+	if includeColumnNames {
+		finalResult = map[string]interface{}{
+			"columns": columns,
+			"rows":    results,
+		}
+	} else {
+		finalResult = results
+	}
+
+	// Convert finalResult to JSON
+	jsonData, err := json.Marshal(finalResult)
 	if err != nil {
 		log.Fatal(err)
 	}
