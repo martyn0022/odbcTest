@@ -1,6 +1,6 @@
 module github.com/martyn0022/odbcTest
 
-go 1.21.5
+go 1.17
 
 require github.com/alexbrainman/odbc v0.0.0-20230814102256-1421b829acc9
 
